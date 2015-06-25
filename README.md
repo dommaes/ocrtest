@@ -3,6 +3,7 @@
 ocrtest is a small bash shell script to test different OCR suites on Linux.
 It was written on Ubuntu 15.04 to help test [OCRFeeder](https://wiki.gnome.org/action/show/Apps/OCRFeeder?action=show&redirect=OCRFeeder) and [ocropus](https://github.com/tmbdev/ocropy) during a college project.
 
+## Usage
 
 You can run a test by typing
 ```
