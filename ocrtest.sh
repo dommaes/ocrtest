@@ -82,11 +82,6 @@ write_testcase() {
 	write_text "TESTCASE "$1
 }
 
-# change the used engine in ocrfeeder
-set_engine() {
-	cp ~/.ocrfeeder/$1.xml ~/.ocrfeeder/preferences.xml
-}
-
 # process ocr with ocropus
 ocropus() {
 	# current image file
@@ -94,7 +89,7 @@ ocropus() {
 	# name of current testcase
 	TCN=${TC%%.*}
 	# path to ocropus binaries
-	BINPATH=ocropus_bin
+	BINPATH=ocropy
 	# output path
 	OPATH=$TESTPATH/ocropus
 	write_begin $FUNCNAME $TCN
@@ -111,15 +106,14 @@ ocropus() {
 }
 
 # process ocr with tesseract
-tesseract() {
+tesseract_f() {
 	TC=$1
 	TCN=${TC%%.*}
-	set_engine "tesseract"
 	OPATH=$TESTPATH/tesseract
 	write_begin $FUNCNAME $TCN
 	BEGIN=$TIMESTAMP
 	# begin actual processing
-	ocrfeeder-cli -i $TC -o $OPATH/$TCN -f HTML
+	tesseract $TC $OPATH/$TCN -l deu
 	# end actual processing
 	write_end $FUNCNAME
 	END=$TIMESTAMP
@@ -127,14 +121,13 @@ tesseract() {
 }
 
 # process ocr with ocrad
-ocrad() {
+ocrad_f() {
 	TC=$1
 	TCN=${TC%%.*}
-	set_engine "ocrad"
 	OPATH=$TESTPATH/ocrad
 	write_begin $FUNCNAME $TCN
 	BEGIN=$TIMESTAMP
-	ocrfeeder-cli -i $TC -o $OPATH/$TCN -f HTML
+	tifftopnm $TC | ocrad -o $OPATH/$TCN.txt
 	write_end $FUNCNAME
 	END=$TIMESTAMP
 	write_time $BEGIN $END
@@ -153,9 +146,9 @@ for ((i=1;i<=$RUNS;i++)); do
 		# begin processing with ocropus
 		ocropus $j
 		# begin processing with ocrfeeder + tesseract
-		tesseract $j
+		tesseract_f $j
 		# begin processing with ocrfeeder + ocrad
-		ocrad $j
+		ocrad_f $j
 	done
 
 	write_text "END run "$RUNNR
